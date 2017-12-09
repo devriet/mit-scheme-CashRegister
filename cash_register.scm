@@ -1,11 +1,30 @@
 (define taxrate 0.065)
 (define (roundToTwo val)
+	(let ((x
 	(/ (inexact->exact (round (+ (* val 100) 0.01))) 100.00)
+	))
+	(cond
+	((eq? x 0)
+	0.0
+	) (else x)
+	))
+)
+(define (right-pad number len)
+	(let* ((nstr (number->string number))
+         	(diff (- len (string-length nstr)))
+         	(pads (if (> diff 0) (make-string diff #\0) "")))
+		(string-append nstr pads)
+	)
+)
+(define (showDollars val)
+	(let ((x (number->string (* val 1.0))))
+	(right-pad val (+ (string-length x) (- 2 (- (string-length x) (string-search-backward "." x)))))
+	)
 )
 (define (cash total num)
 	(display (string-append "Subtotal: $"
-			(number->string
-				(roundtotwo (+ total num))
+			(showdollars
+				(* 1.00 (roundtotwo (+ total num)))
 			)
 		"\n\nEnter value: $")
 	)
@@ -15,15 +34,15 @@
 			((eq? x 0)
 			(display (string-append
 				(string-append "\nSubtotal: $"
-					(number->string
+					(showdollars
 						(roundtotwo (+ total num))
 					)
 				) (string-append "\nTax: $"
-					(number->string
+					(showdollars
 						(roundtotwo (* (+ total num) taxrate))
 					)
 				) (string-append "\nTotal: $" 
-					(number->string 
+					(showdollars 
 						(roundToTwo (+ (+ total num) (* (+ total num) taxrate)))
 					)
 				) "\n\n\n"
@@ -34,10 +53,10 @@
 		)
 	)
 )
-(define (main)
+(define (main) 
 	(display "\nScheme Point-of-Sale
 Start transaction (exit with 0):
 -------------------------------------------\n\n"
-	)(cash 0 0)
+	)(cash 0.0 0.0)
 )
 (main)
